@@ -64,6 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_verified = models.BooleanField(default=False, help_text='Email activated')
     is_staff = models.BooleanField(default=False, help_text='Работник')
     is_superuser = models.BooleanField(default=False, help_text='админ')
+    is_mentor = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'directions', 'month']
     objects = UserManager()

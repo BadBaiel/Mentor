@@ -1,7 +1,7 @@
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView, CreateAPIView
 from .models import Mentor
-from .serializers import MentorSerializer, MentorDetailSerializer, MentorListsSerializer
+from .serializers import MentorSerializer, MentorDetailSerializer, MentorListsSerializer, MentorProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.response import Response
@@ -9,7 +9,9 @@ from django.http import HttpResponseRedirect
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import MentorFilter
 from django.db.models import Count
-
+from rest_framework.views import APIView
+from apps.users.models import User
+from apps.users.serializers import PersonalProfileSerializer
 class MentorListAPIView(ListAPIView):
     queryset = Mentor.objects.filter(is_active=True).annotate(like_count=Count('likes')).order_by('-like_count')
     serializer_class = MentorListsSerializer
@@ -56,6 +58,37 @@ class MentorDetailAPIView(RetrieveUpdateDestroyAPIView):
     queryset = Mentor.objects.filter(is_active=True)
     serializer_class = MentorDetailSerializer
     permission_classes = (IsOwnerOrReadOnly, )
+
+
+class MentorProfileView(APIView):
+    def get(self, request):
+        user = request.user
+        if user.is_mentor:
+            snippets = Mentor.objects.filter(user=user)
+            serializer = MentorProfileSerializer(snippets, many=True)
+            return Response(serializer.data)
+        else:
+            snippets = User.objects.filter(email=user.email)
+            serializer = PersonalProfileSerializer(snippets, many=True)
+            return Response(serializer.data)
+
+#    if Mentor.objects.filter(is_mentor=True):
+#        serializer_class = MentorProfileSerializer
+#
+#        def get(self, request):
+#            snippets = Mentor.objects.filter(user=request.user)
+#            serializer = MentorProfileSerializer(snippets, many=True)
+#
+#            return Response(serializer.data)
+#    else:
+#
+#        serializer_class = PersonalProfileSerializer
+#
+#        def get(self, request):
+#                snippets = User.objects.filter(email=request.user)
+#                serializer = PersonalProfileSerializer(snippets, many=True)
+#
+#                return Response(serializer.data)
 
 
 class AddLike(ListCreateAPIView):

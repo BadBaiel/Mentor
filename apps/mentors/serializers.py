@@ -59,5 +59,23 @@ class MentorDetailSerializer(WritableNestedModelSerializer, serializers.ModelSer
                   'likes_count', 'dislikes_count', 'students_count']
 
 
+class MentorProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mentor
+        fields = ('id', 'group', 'name', 'about_me', 'directions', 'month', 'contact', 'likes_count', 'dislikes_count',
+                  'students_count', 'skills', 'employment')
+
+    # def to_representation(self, instance):
+    #     repr = super().to_representation(instance)
+    #     repr['name'] = instance.name
+    #     repr['directions'] = instance.directions
+    #     repr['month'] = instance.month
+    #     repr['group'] = instance.group
+    #     repr['about_me'] = instance.about_me
+    #     repr['contact'] = instance.contact
+    #     repr['students_count'] = instance.students_count
+    #     return repr
+
+
 
 

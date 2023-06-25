@@ -123,12 +123,44 @@ class LogOutView(generics.GenericAPIView):
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+from apps.mentors.models import Mentor
+from apps.mentors.serializers import MentorProfileSerializer
+#class PersonalProfileView(APIView):
+#    serializer_class = PersonalProfileSerializer
+#
+#    def get(self, request):
+#        snippets = User.objects.filter(email=request.user)
+#        serializer = PersonalProfileSerializer(snippets, many=True)
+#
+#        return Response(serializer.data)
+#    if User.objects.filter(is_mentor=True):
+#        serializer_class = PersonalProfileSerializer
+#
+#        def get(self, request):
+#            snippets = User.objects.filter(email=request.user)
+#            serializer = PersonalProfileSerializer(snippets, many=True)
+#
+#            return Response(serializer.data)
+#
+#    else:
+#        serializer_class = MentorProfileSerializer
+#
+#        def get(self, request):
+#            snippets = Mentor.objects.filter(user=request.user)
+#            serializer = MentorProfileSerializer(snippets, many=True)
+#
+#            return Response(serializer.data)
+
+
 
 class PersonalProfileView(APIView):
-    serializer_class = PersonalProfileSerializer
-
     def get(self, request):
-        snippets = User.objects.filter(email=request.user)
-        serializer = PersonalProfileSerializer(snippets, many=True)
-
-        return Response(serializer.data)
+        user = request.user
+        if user.is_mentor:
+            snippets = Mentor.objects.filter(user=user)
+            serializer = MentorProfileSerializer(snippets, many=True)
+            return Response(serializer.data)
+        else:
+            snippets = User.objects.filter(email=user.email)
+            serializer = PersonalProfileSerializer(snippets, many=True)
+            return Response(serializer.data)
